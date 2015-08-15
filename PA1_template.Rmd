@@ -1,8 +1,10 @@
 # Reproducible Research, Assignment #1
 
 ```{r setoptions, echo=FALSE}
-### This code chunk just sets defaults across all code chunks.  I know the default setting is echo=TRUE, but since it was specifically requested in the assignment, I thought I would explicitly add it
-knitr::opts_chunk$set(echo=TRUE)
+### This code chunk just sets defaults across all code chunks.  I know the
+### default setting is echo=TRUE, but since it was specifically requested in the
+###assignment, I thought I would explicitly add it.
+knitr::opts_chunk$set(echo=TRUE, fig.path = 'figures/')
 ```
 
 ----------------------------------------
