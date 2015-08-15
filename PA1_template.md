@@ -1,11 +1,6 @@
 # Reproducible Research, Assignment #1
 
-```{r setoptions, echo=FALSE}
-### This code chunk just sets defaults across all code chunks.  I know the
-### default setting is echo=TRUE, but since it was specifically requested in the
-###assignment, I thought I would explicitly add it.
-knitr::opts_chunk$set(echo=TRUE, fig.path = 'figures/')
-```
+
 
 ----------------------------------------
 
@@ -13,10 +8,9 @@ knitr::opts_chunk$set(echo=TRUE, fig.path = 'figures/')
 
 We begin by loading the data and processing it into a suitable format for our needs.
 
-```{r load_data}
+
+```r
     ## be sure the activity.csv file is in the appropriate working directory
-#this.dir <- dirname(sys.frame(1)$ofile)
-#setwd(this.dir) 
 activity <- read.csv("activity.csv", 
                       colClasses = c("integer", "Date", "integer"))
 ```
@@ -27,7 +21,8 @@ activity <- read.csv("activity.csv",
 
 We would like to know the mean and median steps per day.  To begin, let us populate a vector of steps taken per day.
 
-```{r Steps-Mean}
+
+```r
 ### steps_by_date - a vector of total steps taken each day
 ### days - the number of days in our data set
 
@@ -41,23 +36,27 @@ for (i in 1:days){
 
 We obtain the following histogram of the total number of steps taken per day:
 
-```{r Steps-Histogram}
+
+```r
 hist(steps_by_date, breaks=20, col="Red",
      xlab = "Daily step totals",
      main = "Histogram of daily step totals from October 1 to November 30, 2012")
 ```
 
+![plot of chunk Steps-Histogram](figures/Steps-Histogram-1.png) 
+
 
 We would like to know the mean and median of the steps taken per day.
 
-```{r Steps-Averages}
+
+```r
 mean_steps_by_date <- mean(steps_by_date, na.rm = TRUE)
 median_steps_by_date <- median(steps_by_date, na.rm = TRUE)
 ```
 
-* The **mean steps** taken per day is `r format(mean_steps_by_date, scientific=FALSE)`
+* The **mean steps** taken per day is 10766.19
 
-* The **median steps** taken per day is `r median_steps_by_date`.
+* The **median steps** taken per day is 10765.
 
 ----------------------------------------
 
@@ -65,7 +64,8 @@ median_steps_by_date <- median(steps_by_date, na.rm = TRUE)
 
 What if we wanted to study the pattern of steps taken in each 5-minute time interval, averaged over the days of our data set?
 
-```{r Steps-Time}
+
+```r
 activity_by_time <- split(activity, activity$interval)
 times <- unique(activity$interval)
 steps_by_time <- vector("integer", length(times))
@@ -76,17 +76,21 @@ for (i in 1:length(times)){
 
 When we average each 5 minute interval over the two month period, we obtain the following graph of average steps per time interval.
 
-```{r Steps_plot}
+
+```r
 plot(times, steps_by_time, type="l",
      xlab = "Time of day (using a 24-hour clock in 5-minute intervals)",
      ylab = "Average number of steps taken",
      main = "Average steps taken versus time of day")
 ```
 
+![plot of chunk Steps_plot](figures/Steps_plot-1.png) 
+
 
 What 5 minute time period has the maximum average steps?
 
-```{r Steps_Maximum}
+
+```r
 ### Find where the (first) maximum occurs in the vector of average steps
 when_max <- seq(along=steps_by_time)[steps_by_time == max(steps_by_time)]
 
@@ -94,7 +98,7 @@ when_max <- seq(along=steps_by_time)[steps_by_time == max(steps_by_time)]
 when_max <- times[[when_max]]
 ```
 
-The **maximum** for the 5-minute step averages occurs at `r when_max`.  This is consistent with what we observe in the above graph.
+The **maximum** for the 5-minute step averages occurs at 835.  This is consistent with what we observe in the above graph.
 
 ----------------------------------------
 
@@ -102,13 +106,19 @@ The **maximum** for the 5-minute step averages occurs at `r when_max`.  This is 
 
 We begin by counting the number of NA fields in the data frame.
 
-```{r CountNA}
+
+```r
 sum(is.na(activity$steps))
+```
+
+```
+## [1] 2304
 ```
 
 To fill in the missing NA vlaues, we will use the mean values of that corresponding 5-minute time interval across all of the days. Our *steps_by_time* vector is already a vector of means across every 5-minute interval.
 
-```{r ReplaceNA}
+
+```r
 ### Set up a data frame with the average steps per time interval.
 ### The rows are assigned the time interval as a name.
 
@@ -133,13 +143,19 @@ for (i in 1:length(activity_no_NA$steps)){
 
 Let's confirm that we have filled in all the NA values with another count:
 
-```{r CountNA-again}
+
+```r
 sum(is.na(activity_no_NA$steps))
+```
+
+```
+## [1] 0
 ```
 
 Now compute a histogram of steps with the NA values filled in.  We will rerun the same code as before for the new data frame.
 
-```{r Steps-Histogram-no-NA}
+
+```r
 ### Set up the data for the histogram
 activity_by_date_no_NA <- split(activity_no_NA, activity_no_NA$date) 
 days <- length(activity_by_date_no_NA)
@@ -153,6 +169,8 @@ hist(steps_by_date_no_NA, breaks=20, col="Steelblue",
      main = "Histogram of daily step totals from October 1 to November 30, 2012")
 ```
 
+![plot of chunk Steps-Histogram-no-NA](figures/Steps-Histogram-no-NA-1.png) 
+
 As expected, by replacing the NA values by the mean values for that respective time interval, we observe a surge in the count around the mean in the resulting histogram.
 
 ----------------------------------------
@@ -161,7 +179,8 @@ As expected, by replacing the NA values by the mean values for that respective t
 
 Let us now compare the steps taken on weekdays versus weekends.  We begin by creating a weekday factor variable and appending it to the data set:
 
-```{r Weekends}
+
+```r
 activity_no_NA$weekday <- ifelse(
     weekdays(activity$date)=="Saturday" | weekdays(activity$date)=="Sunday", 
     "weekend", # If the above condition is satified
@@ -171,7 +190,8 @@ activity_no_NA$weekday <- ifelse(
 
 We want to graph the average steps taken versus time interval, averaged over the weekdays and weekends respectively.  To do this, we first compute the average steps taken in each time interval twice -- once averaged over the weekdays, and again averaged over the weekends.
 
-```{r weekends graph set up}
+
+```r
 activity_weekday <- split(activity_no_NA, activity_no_NA$weekday)
 weekday_by_time <- split(activity_weekday$weekday,
                         (activity_weekday$weekday)$interval)
@@ -187,7 +207,8 @@ for (i in 1:length(times)){
 
 Let us now set up a data frame with our calculated average steps per time interval.  The third column will be a factor variable to identify whether the data refers to a weekend or a weekday input.
 
-```{r weekends graph}
+
+```r
 week_frame <- data.frame(Interval = c(times, times), 
                          Steps = c(weekday_steps, weekend_steps), 
                          Weekday = factor(c(rep("weekday", length(times)),
@@ -200,5 +221,6 @@ xyplot(Steps ~ Interval | Weekday,
        layout = c(1,2), 
        type = "l",
        ylab = "Number of steps")
-
 ```
+
+![plot of chunk weekends graph](figures/weekends graph-1.png) 
